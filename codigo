@@ -1,0 +1,118 @@
+#include <SoftwareSerial.h>
+
+// HC-06
+// TX del HC-06 -> A0
+// RX del HC-06 -> A1
+SoftwareSerial BT(A0, A1);   // RX, TX
+
+// ===== L298N =====
+const int ENA = 10;
+const int IN1 = 8;
+const int IN2 = 9;
+
+const int ENB = 11;
+const int IN3 = 12;
+const int IN4 = 13;
+
+int velA = 255;
+int velB = 255;
+
+void setup() {
+  pinMode(ENA, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+
+  pinMode(ENB, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
+  Serial.begin(9600);   // Monitor serial del PC
+  BT.begin(9600);       // HC-06
+
+  detener();
+
+  Serial.println("Robot listo");
+  Serial.println("HC-06 en A0/A1");
+  Serial.println("Comandos esperados: F B L R S");
+}
+
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
+
+    Serial.print("Llego: ");
+    Serial.println(c);
+
+    if (c == 'F') adelante();
+    else if (c == 'B') atras();
+    else if (c == 'L') izquierda();
+    else if (c == 'R') derecha();
+    else if (c == 'S') detener();
+  }
+}
+
+// ================= MOVIMIENTOS =================
+
+void adelante() {
+  analogWrite(ENA, velA);
+  analogWrite(ENB, velB);
+
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+
+  Serial.println("ADELANTE");
+}
+
+void atras() {
+  analogWrite(ENA, velA);
+  analogWrite(ENB, velB);
+
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+
+  Serial.println("ATRAS");
+}
+
+void izquierda() {
+  analogWrite(ENA, velA);
+  analogWrite(ENB, velB);
+
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+
+  Serial.println("IZQUIERDA");
+}
+
+void derecha() {
+  analogWrite(ENA, velA);
+  analogWrite(ENB, velB);
+
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+
+  Serial.println("DERECHA");
+}
+
+void detener() {
+  analogWrite(ENA, 0);
+  analogWrite(ENB, 0);
+
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+
+  Serial.println("DETENIDO");
+}
